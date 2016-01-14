@@ -3312,38 +3312,9 @@ pick_next_entity(struct cfs_rq *cfs_rq, struct sched_entity *curr)
 
 	se = left; /* ideally we run the leftmost entity */
 
-	/*
-	 * Avoid running the skip buddy, if running something else can
-	 * be done without getting too unfair.
-	 */
-	if (cfs_rq->skip == se) {
-		struct sched_entity *second;
-
-		if (se == curr) {
-			second = __pick_first_entity(cfs_rq);
-		} else {
-			second = __pick_next_entity(se);
-			if (!second || (curr && entity_before(curr, second)))
-				second = curr;
-		}
-
-		if (second && wakeup_preempt_entity(second, left) < 1)
-			se = second;
-	}
-
-	/*
-	 * Prefer last buddy, try to return the CPU to a preempted task.
-	 */
-	if (cfs_rq->last && wakeup_preempt_entity(cfs_rq->last, left) < 1)
-		se = cfs_rq->last;
-
-	/*
-	 * Someone really wants this to run. If it's not unfair, run it.
-	 */
-	if (cfs_rq->next && wakeup_preempt_entity(cfs_rq->next, left) < 1)
-		se = cfs_rq->next;
-
-	clear_buddies(cfs_rq, se);
+	//Test Kernel 1: Removed skip buddy implementation. Scheduler will always select
+	//the leftmost entity from the rb tree which should mean that it is always running
+	//the process that needs the cpu the most, no exceptions.
 
 	return se;
 }
